@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clatsop Care Path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one phone-width column. Fixed header and tab bar, scrolling middle, one question per screen. */
+:root{
+  --bg:#EAF0EF;            /* coastal fog */
+  --surface:#FFFFFF;
+  --ink:#0F2A2C;           /* wet basalt */
+  --muted:#4D6567;
+  --line:#CFDAD9;
+  --brand:#0E5450;         /* spruce */
+  --brand-ink:#FFFFFF;
+  --brand-soft:#DCEBE8;
+  --guide:#FFF3CC;         /* lighthouse lamp */
+  --guide-line:#D9A91F;
+  --guide-ink:#4E3B00;
+  --crisis:#B4261C;
+  --crisis-ink:#FFFFFF;
+  --crisis-soft:#FBE7E4;
+  --outer:#D9E3E2;
+  --font-display:"Bricolage Grotesque","Public Sans",system-ui,sans-serif;
+  --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1617;--surface:#132324;--ink:#E7F0EF;--muted:#9BB1B1;--line:#283B3C;
+    --brand:#74D3C6;--brand-ink:#052220;--brand-soft:#1A3533;
+    --guide:#2C260E;--guide-line:#C99E2B;--guide-ink:#F3DE9E;
+    --crisis:#FF8F83;--crisis-ink:#2A0906;--crisis-soft:#391916;--outer:#060D0E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1617;--surface:#132324;--ink:#E7F0EF;--muted:#9BB1B1;--line:#283B3C;
+  --brand:#74D3C6;--brand-ink:#052220;--brand-soft:#1A3533;
+  --guide:#2C260E;--guide-line:#C99E2B;--guide-ink:#F3DE9E;
+  --crisis:#FF8F83;--crisis-ink:#2A0906;--crisis-soft:#391916;--outer:#060D0E;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--outer);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--brand)}
+:focus-visible{outline:3px solid var(--guide-line);outline-offset:2px;border-radius:6px}
+svg{flex:none}
+
+.app{height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);box-shadow:0 0 0 1px var(--line)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center}
+.brand b{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:-.01em;display:block;line-height:1.1}
+.brand small{font-size:12px;color:var(--muted);display:block}
+.brand{min-width:0}
+.sos{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--crisis);color:var(--crisis);background:var(--crisis-soft);border-radius:999px;padding:8px 12px;font-weight:700;font-size:14px;white-space:nowrap}
+
+main{flex:1;overflow-y:auto;padding:20px 16px 0;display:flex;flex-direction:column;gap:16px}
+main:focus{outline:none}
+main>*{flex-shrink:0}
+main>:last-child:not(.actions){margin-bottom:24px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+h1{font-size:28px;line-height:1.12;font-weight:700}
+h2{font-size:23px;line-height:1.15;font-weight:700}
+h3{font-size:17px;line-height:1.25;font-weight:600}
+p{margin:0}
+.lede{color:var(--muted);font-size:16px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:10px}
+.stack-lg{display:flex;flex-direction:column;gap:16px}
+
+.progress{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.progress i{height:5px;border-radius:99px;background:var(--line)}
+.progress i.on{background:var(--brand)}
+
+.guide{background:var(--guide);color:var(--guide-ink);border-left:4px solid var(--guide-line);border-radius:10px;padding:12px 14px}
+.guide .gl{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.guide ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14.5px}
+
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px;min-height:56px}
+.opt .box{width:22px;height:22px;margin-top:1px;border:2px solid var(--muted);border-radius:6px;display:grid;place-items:center;color:transparent}
+.opt.radio .box{border-radius:50%}
+.opt[aria-pressed="true"],.opt[aria-checked="true"]{border-color:var(--brand);background:var(--brand-soft)}
+.opt[aria-pressed="true"] .box,.opt[aria-checked="true"] .box{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.opt b{display:block;font-weight:600}
+.opt small{display:block;color:var(--muted);font-size:13.5px;margin-top:2px}
+.opt.alert{border-color:var(--crisis)}
+.opt.alert[aria-pressed="true"],.opt.alert[aria-checked="true"]{background:var(--crisis-soft);border-color:var(--crisis)}
+.opt.alert[aria-pressed="true"] .box,.opt.alert[aria-checked="true"] .box{background:var(--crisis);border-color:var(--crisis);color:var(--crisis-ink)}
+
+.actions{display:flex;gap:10px;position:sticky;bottom:0;margin:4px -16px 0;padding:14px 16px 14px;background:linear-gradient(to top,var(--bg) 82%,transparent)}
+.btn{flex:1;border:0;border-radius:12px;padding:14px 16px;font-weight:700;font-size:16px;background:var(--brand);color:var(--brand-ink);text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.ghost{flex:0 0 auto;background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.red{background:var(--crisis);color:var(--crisis-ink)}
+.link{background:none;border:0;padding:0;color:var(--brand);font-weight:600;text-decoration:underline}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card.first{border:2px solid var(--brand)}
+.card.red{border:2px solid var(--crisis);background:var(--crisis-soft)}
+.tag{align-self:flex-start;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--brand);color:var(--brand-ink)}
+.tag.soft{background:var(--brand-soft);color:var(--brand)}
+.card p{font-size:15px}
+.why{color:var(--muted);font-size:14px}
+.ask{background:var(--brand-soft);border-radius:10px;padding:10px 12px;font-size:14.5px}
+.ask b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);margin-bottom:2px}
+.meta{display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--muted)}
+.meta div{display:flex;gap:8px;align-items:flex-start}
+.meta svg{margin-top:2px}
+.call{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--brand);border-radius:10px;padding:11px 12px;text-decoration:none;color:var(--ink);font-weight:600;background:var(--surface)}
+.call span{display:inline-flex;align-items:center;gap:8px;color:var(--brand)}
+.call em{font-style:normal;font-variant-numeric:tabular-nums;font-weight:700}
+.card.red .call{border-color:var(--crisis)}
+.card.red .call span{color:var(--crisis)}
+.note{font-size:13.5px;color:var(--muted)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;font-weight:600;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.seg button{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 0;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.bands{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.bands div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:10px;padding:11px 12px;font-size:14.5px;border-top:1px solid var(--line)}
+.bands div:first-child{border-top:0}
+.bands span{font-variant-numeric:tabular-nums;font-weight:700}
+.bands small{display:block;color:var(--muted);font-size:13px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;font-weight:600}
+.steps li::before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:700;flex:none}
+.script{background:var(--surface);border:1px dashed var(--muted);border-radius:12px;padding:14px;font-size:15px}
+.check{margin:0;padding-left:20px;font-size:15px;display:flex;flex-direction:column;gap:4px}
+.fine{font-size:13px;color:var(--muted)}
+.src{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-top:1px solid var(--line)}
+.tabs button{background:none;border:0;padding:9px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
+.tabs button[aria-current="page"]{color:var(--brand)}
+.tabs button.t-crisis[aria-current="page"]{color:var(--crisis)}
+@media (prefers-reduced-motion:no-preference){.opt,.btn,.seg button{transition:background-color .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <button class="brand" data-act="home" aria-label="Clatsop Care Path, go to start">
+      <span class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c0-5 4-5 4-9a3 3 0 0 1 6 0c0 4 4 4 4 9"/><circle cx="12" cy="5" r="1.6"/></svg></span>
+      <span><b>Clatsop Care Path</b><small>Mental health help</small></span>
+    </button>
+    <button class="sos" data-act="tab" data-v="crisis"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9.5"/></svg>Crisis help</button>
+  </header>
+  <main id="main" tabindex="-1"></main>
+  <nav class="tabs" aria-label="Sections">
+    <button data-act="tab" data-v="guide"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Guide</button>
+    <button data-act="tab" data-v="directory"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>Directory</button>
+    <button class="t-crisis" data-act="tab" data-v="crisis"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Crisis</button>
+  </nav>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Icons ---------- */
+var I={
+ phone:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+ pin:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>',
+ clock:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></svg>',
+ check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.500"/></svg>',
+ sign:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M12 5h7l2 2.500-2 2.500h-7"/><path d="M12 13H6l-2 2.500L6 18h6"/></svg>'
+};
+
+/* ---------- Verified contacts (checked November 13, 2026) ---------- */
+var CBH_MAIN={l:"Main line",n:"503-325-5722"};
+var K={
+ rac:{title:"CBH Rapid Access Clinic",desc:"Walk in and meet with a clinician the same day. No appointment and no insurance required. For adults 18 and older.",ask:"Tell the front desk you are there for the Rapid Access Clinic.",hours:"Walk-in hours: Monday to Friday, 9 am to 3 pm",places:["115 W Bond St, Astoria","1005 Broadway St, Seaside"],phones:[{l:"Questions",n:"503-325-5722"}],note:"This is not an emergency room. After hours, call the county crisis line at 503-325-5724."},
+ cbhYouthUrgent:{title:"CBH Child and Family Team",desc:"Urgent appointments for children and teens under 18, during regular business hours.",ask:"Say you need an urgent appointment for someone under 18.",hours:"Monday to Friday, 8 am to 5 pm",places:["486 12th St, Astoria"],phones:[CBH_MAIN],note:"After hours, call the county crisis line at 503-325-5724."},
+ cbh:{title:"Clatsop Behavioral Healthcare (CBH)",desc:"The county's community mental health provider. Counseling, psychiatric care, and substance use treatment for adults.",ask:"Ask for an Engagement Specialist. Say you want to enroll in services.",hours:"Monday to Friday, 8 am to 5 pm",places:["Clinics in Astoria and Seaside"],phones:[CBH_MAIN]},
+ cbhKids:{title:"CBH Child and Family Services",desc:"Counseling and psychiatric care for children, teens, and their families.",ask:"Ask for an Engagement Specialist. Say the care is for a child or teen.",hours:"Monday to Friday, 8 am to 5 pm",places:["486 12th St, Astoria"],phones:[CBH_MAIN]},
+ sud:{title:"CBH Addiction Recovery",desc:"Counseling and treatment for adults 18 and older who want help with alcohol or drug use.",ask:"Say you want to start substance use treatment.",hours:"Monday to Friday, 9 am to 3 pm",places:["115 W Bond St, Astoria"],phones:[CBH_MAIN]},
+ cmh:{title:"CMH-OHSU Health Primary Care",desc:"Columbia Memorial Hospital builds behavioral health into its primary care clinics. Visits in person or by video.",ask:"Ask the front desk to connect you with a behavioral health provider.",places:["2158 Exchange St, Suite 107, Astoria","1639 SE Ensign Lane, Suite B103, Warrenton","1111 N Roosevelt Dr, Suite 210, Seaside"],phones:[{l:"Astoria",n:"503-338-4675"},{l:"Warrenton",n:"503-338-4500"},{l:"Seaside",n:"503-738-3002"}],note:"Confirm the clinic takes your plan when you call."},
+ coastal:{title:"Coastal Family Health Center",desc:"Community health center with primary care and behavioral health. Fees slide with your income. It sees patients with or without insurance.",ask:"Ask for a behavioral health appointment and the sliding fee application.",places:["2275 Commercial St, Astoria"],phones:[{l:"Clinic",n:"503-325-8315"}]},
+ cco:{title:"Columbia Pacific CCO",desc:"The plan that manages Oregon Health Plan benefits in Clatsop County. Mental health care and substance use treatment cost members nothing.",ask:"Ask for help finding a mental health provider near you.",phones:[{l:"Behavioral health help",n:"503-488-2822"},{l:"Customer service",n:"855-722-8206"}]},
+ insurer:{title:"Your insurance plan",desc:"Your plan keeps the current list of therapists and prescribers it covers, including video visits.",ask:"Call the member number on the back of your card. Ask for in-network outpatient mental health providers in Clatsop County, and what a visit will cost you."},
+ tricare:{title:"Your TRICARE plan",desc:"TRICARE keeps the list of covered mental health providers for military families.",ask:"Call the number on your TRICARE card. Ask for covered outpatient mental health providers near Astoria."},
+ eap:{title:"Your employer's Employee Assistance Program",desc:"Many employers pay for a few free, confidential counseling sessions through an EAP. You can use them before or alongside insurance.",ask:"Ask HR or check your benefits guide for the EAP phone number. You do not have to say why you want it."},
+ va:{title:"Astoria VA Clinic",desc:"Mental health care, counseling, and video visits for Veterans enrolled in VA health care.",ask:"Call the appointment line and choose option 3. Ask for mental health care.",hours:"Monday to Friday, 8 am to 4 pm",places:["3196 Marine Drive, Astoria"],phones:[{l:"Appointments",n:"503-721-1498"},{l:"Clinic",n:"503-220-8262",x:"52593"}]},
+ cvso:{title:"Clatsop County Veterans Services",desc:"Free help enrolling in VA health care and benefits if you served and are not signed up yet.",phones:[{l:"Office",n:"971-308-1045"}]},
+ shiba:{title:"Medicare help (SHIBA)",desc:"Free, unbiased counseling from the State of Oregon on what your Medicare plan covers.",ask:"Ask what your plan pays for outpatient mental health visits.",phones:[{l:"SHIBA",n:"800-722-4134"},{l:"Medicare",n:"800-633-4227"}]},
+ ohp:{title:"Apply for the Oregon Health Plan",desc:"OHP is free coverage that includes mental health care. You can apply any time of year. One application covers OHP and OHP Bridge. A decision can take up to 45 days.",ask:"Online at ONE.Oregon.gov, by phone, or in person at the ODHS office in Astoria.",hours:"Phone: Monday to Friday, 7 am to 6 pm",places:["ODHS office: 422 Gateway Ave, Astoria"],phones:[{l:"ONE Customer Service",n:"800-699-9075"}],link:{t:"ONE.Oregon.gov",h:"https://one.oregon.gov"}},
+ explore:{title:"Explore Health marketplace",desc:"Oregon's marketplace for private plans, with help paying premiums based on income. Open enrollment for 2027 runs through January 15, 2027. Enroll by December 31 for coverage that starts January 1.",ask:"Ask for a free local assister or agent to help you compare plans.",hours:"Monday to Friday 8 am to 5 pm, Saturday 8 am to 1 pm",phones:[{l:"Explore Health",n:"855-268-3767"}],link:{t:"ExploreHealthOR.gov",h:"https://explorehealthor.gov"}},
+ warm:{title:"Reach Out Oregon Parent Warmline",desc:"A statewide support line for parents and caregivers.",phones:[{l:"Warmline",n:"833-732-2467"}]},
+ c911:{title:"911",desc:"If you or someone else is in immediate danger.",phones:[{l:"Emergency",n:"911"}],red:1},
+ c988:{title:"988 Suicide and Crisis Lifeline",desc:"Call or text 988 to reach a trained counselor. Free and confidential, 24 hours a day. Press 2 for Spanish.",phones:[{l:"Call or text",n:"988"}],link:{t:"Chat at 988lifeline.org/chat",h:"https://988lifeline.org/chat"},red:1},
+ ccl:{title:"Clatsop County 24-hour crisis line",desc:"Run by Clatsop Behavioral Healthcare. It answers day and night and can connect you with the county's mobile crisis team.",phones:[{l:"Crisis line",n:"503-325-5724"}],red:1},
+ vcl:{title:"Veterans Crisis Line",desc:"For Veterans, service members, and their families. You do not need to be enrolled in VA care.",phones:[{l:"Call 988, then press 1",n:"988"},{l:"Text",n:"838255"}],red:1},
+ er:{title:"Emergency rooms",desc:"Open 24 hours. Go to the closest one or call 911.",places:["Columbia Memorial Hospital, 2111 Exchange St, Astoria","Providence Seaside Hospital, 725 S Wahanna Rd, Seaside"],phones:[{l:"Columbia Memorial ER",n:"503-338-4046"}],red:1}
+};
+
+/* ---------- Questions ---------- */
+var CONCERNS=[
+ {id:"safety",t:"Thoughts of suicide, or of hurting myself or someone else",alert:1},
+ {id:"low",t:"Feeling down, hopeless, or not interested in things",p:"feeling down and hopeless"},
+ {id:"anx",t:"Anxiety, constant worry, or panic attacks",p:"anxiety and panic"},
+ {id:"stress",t:"Stress, burnout, or trouble sleeping",p:"stress and trouble sleeping"},
+ {id:"grief",t:"Grief, loss, or a major life change",p:"grief"},
+ {id:"trauma",t:"Trauma, bad memories, or nightmares",p:"trauma and bad memories"},
+ {id:"sud",t:"Alcohol or drug use I want help with",p:"alcohol or drug use"},
+ {id:"psy",t:"Hearing or seeing things others do not, or very confused thinking",p:"confused thinking"},
+ {id:"rel",t:"Conflict at home, in a relationship, or at work",p:"conflict at home or work"},
+ {id:"unsure",t:"Not sure. I just do not feel like myself",p:"not feeling like myself"}
+];
+var URG=[
+ {id:"now",t:"Right now",s:"I am not safe, or someone else is not safe.",alert:1},
+ {id:"week",t:"Today or this week",s:"I am struggling to get through the day."},
+ {id:"wait",t:"Soon, and I can wait for an appointment",s:"Things are hard but steady."}
+];
+var WHO=[{id:"adult",t:"An adult, 18 or older"},{id:"minor",t:"A child or teen under 18"}];
+var COV=[
+ {id:"private",t:"Insurance through a job or a private plan",s:"Such as Regence, Providence, Moda, PacificSource, Kaiser, Aetna, or Cigna."},
+ {id:"ohp",t:"Oregon Health Plan (OHP)",s:"Oregon's Medicaid. In Clatsop County the plan is usually Columbia Pacific CCO."},
+ {id:"medicare",t:"Medicare",s:"Red, white, and blue card, or a Medicare Advantage plan."},
+ {id:"va",t:"VA health care or TRICARE",s:"Veterans, service members, and military families."},
+ {id:"none",t:"No insurance",s:"We will show coverage you can apply for."},
+ {id:"unsure",t:"I'm not sure",s:"We will help you find out."}
+];
+var COVLABEL={private:"Private insurance",ohp:"Oregon Health Plan",medicare:"Medicare",va:"VA or TRICARE",none:"No insurance",unsure:"Coverage unknown"};
+/* OHP Bridge yearly income range by household size, Oregon Health Authority, in effect through February 2027 */
+var BANDS={1:[21228,31920],2:[28788,43280],3:[36336,54640],4:[43896,66000]};
+
+/* ---------- State (kept in memory only; nothing is stored or sent) ---------- */
+var S={tab:"guide",view:"home",concerns:{},urgency:null,who:null,cov:null,hh:1,crisisFrom:null,shown:false};
+var main=document.getElementById("main");
+
+function money(n){return "$"+n.toLocaleString("en-US");}
+function tel(p){var d=p.n.replace(/\D/g,"");return "tel:"+d+(p.x?","+p.x:"");}
+function guide(items){return '<aside class="guide"><div class="gl">'+I.sign+'Guide</div><ul>'+items.map(function(x){return "<li>"+x+"</li>";}).join("")+"</ul></aside>";}
+function progress(n){var h='<div class="progress" role="img" aria-label="Step '+n+' of 4">';for(var i=1;i<=4;i++)h+='<i class="'+(i<=n?"on":"")+'"></i>';return h+"</div>";}
+function head(n,label,title,lede){return progress(n)+'<div class="stack"><p class="eyebrow">Step '+n+" of 4 · "+label+"</p><h2>"+title+"</h2>"+(lede?'<p class="lede">'+lede+"</p>":"")+"</div>";}
+function opt(o,on,kind,act){
+ return '<button class="opt '+kind+(o.alert?" alert":"")+'" '+(kind==="radio"?'role="radio" aria-checked="':'aria-pressed="')+(on?"true":"false")+'" data-act="'+act+'" data-v="'+o.id+'"><span class="box">'+I.check+"</span><span><b>"+o.t+"</b>"+(o.s?"<small>"+o.s+"</small>":"")+"</span></button>";
+}
+function card(c,o){
+ o=o||{};
+ var h='<article class="card'+(o.first?" first":"")+(c.red?" red":"")+'">';
+ if(o.tag)h+='<span class="tag'+(o.first?"":" soft")+'">'+o.tag+"</span>";
+ h+="<h3>"+c.title+"</h3><p>"+c.desc+"</p>";
+ if(o.why)h+='<p class="why">'+o.why+"</p>";
+ if(c.ask)h+='<div class="ask"><b>Who to ask for</b>'+c.ask+"</div>";
+ if(c.phones)h+=c.phones.map(function(p){return '<a class="call" href="'+tel(p)+'"><span>'+I.phone+p.l+"</span><em>"+p.n+(p.x?" ext. "+p.x:"")+"</em></a>";}).join("");
+ if(c.places||c.hours){h+='<div class="meta">';
+  if(c.hours)h+="<div>"+I.clock+"<span>"+c.hours+"</span></div>";
+  if(c.places)h+=c.places.map(function(p){return "<div>"+I.pin+"<span>"+p+"</span></div>";}).join("");
+  h+="</div>";}
+ if(c.link)h+='<a href="'+c.link.h+'" target="_blank" rel="noopener">'+c.link.t+"</a>";
+ if(o.note||c.note)h+='<p class="note">'+(o.note||c.note)+"</p>";
+ return h+"</article>";
+}
+function picked(){return CONCERNS.filter(function(c){return S.concerns[c.id];});}
+
+/* ---------- Views ---------- */
+function vHome(){
+ return '<div class="stack"><p class="eyebrow">Clatsop County, Oregon · Free and private</p><h1>Find the right mental health care, one step at a time</h1><p class="lede">Answer a few questions. You get the right clinic, the right phone number, and what to say when you call.</p></div>'+
+ '<ol class="steps"><li>What you are feeling</li><li>How soon you need help</li><li>Your insurance</li><li>Your plan: who to call first</li></ol>'+
+ guide(["Takes about two minutes.","Private. Your answers stay on this screen. Nothing is saved or sent.","This is not a diagnosis. It points you to people who can help."])+
+ '<button class="btn" data-act="go" data-v="s1">Start</button>'+
+ '<article class="card red"><h3>Not safe right now?</h3><p>Call or text 988, or call the Clatsop County crisis line at 503-325-5724. Both answer 24 hours a day.</p><button class="btn red" data-act="tab" data-v="crisis">See crisis help</button></article>'+
+ '<p class="fine">Independent community guide. Not run by any clinic, insurer, or government agency.</p>';
+}
+function vS1(){
+ var n=picked().length;
+ return head(1,"Symptoms","What is going on?","Choose everything that fits.")+
+ guide(["More than one answer is normal. Pick all that apply.","You do not need the medical word. Choose what sounds closest.","Answering for someone else? Choose what you have noticed."])+
+ '<div class="stack" role="group" aria-label="Symptoms">'+CONCERNS.map(function(c){return opt(c,!!S.concerns[c.id],"multi","concern");}).join("")+"</div>"+
+ '<div class="actions"><button class="btn ghost" data-act="go" data-v="home">Back</button><button class="btn" data-act="next1"'+(n?"":" disabled")+">Continue</button></div>";
+}
+function vS2(){
+ return head(2,"Urgency","How soon do you need help?")+
+ guide(["Choose <b>Right now</b> if you might act on thoughts of harming yourself or someone else.","Choose <b>Today or this week</b> if you are missing work, not sleeping or eating, or barely coping.","Choose <b>Soon</b> if things are hard but steady."])+
+ '<div class="stack" role="radiogroup" aria-label="How soon">'+URG.map(function(u){return opt(u,S.urgency===u.id,"radio","urg");}).join("")+"</div>"+
+ '<h3>Who needs care?</h3><div class="stack" role="radiogroup" aria-label="Who needs care">'+WHO.map(function(w){return opt(w,S.who===w.id,"radio","who");}).join("")+"</div>"+
+ '<div class="actions"><button class="btn ghost" data-act="go" data-v="s1">Back</button><button class="btn" data-act="next2"'+(S.urgency&&S.who?"":" disabled")+">Continue</button></div>";
+}
+function vS3(){
+ return head(3,"Insurance","What health coverage do you have?","This decides which clinics cost you the least.")+
+ guide(["Check your wallet for a card. The plan name is on the front.","Have more than one? Pick the card you use most.","No card and no idea? Choose <b>I'm not sure</b>."])+
+ '<div class="stack" role="radiogroup" aria-label="Health coverage">'+COV.map(function(c){return opt(c,S.cov===c.id,"radio","cov");}).join("")+"</div>"+
+ '<div class="actions"><button class="btn ghost" data-act="go" data-v="s2">Back</button><button class="btn" data-act="next3"'+(S.cov?"":" disabled")+">"+(S.cov==="none"?"See coverage options":"See my plan")+"</button></div>";
+}
+function vS3b(){
+ var b=BANDS[S.hh];
+ return head(3,"Coverage you can apply for","You may qualify for free or low-cost coverage","Pick your household size to see what likely fits.")+
+ guide(["Count yourself, your spouse, and anyone you claim on your taxes.","Use income before taxes for the whole household.","Do not wait for approval to get care. Your plan on the next screen includes clinics that see people without insurance."])+
+ '<div class="stack"><p class="eyebrow">People in your household</p><div class="seg" role="group" aria-label="Household size">'+[1,2,3,4].map(function(n){return '<button data-act="hh" data-v="'+n+'" aria-pressed="'+(S.hh===n)+'">'+n+"</button>";}).join("")+"</div></div>"+
+ '<div class="bands"><div><span>Under '+money(b[0])+'<small>a year</small></span><p><b>Oregon Health Plan</b><small>Free. Covers mental health care.</small></p></div>'+
+ "<div><span>"+money(b[0])+" to "+money(b[1])+'<small>a year</small></span><p><b>OHP Bridge</b><small>Free. Adults 19 to 64 without an affordable plan from a job.</small></p></div>'+
+ "<div><span>Over "+money(b[1])+'<small>a year</small></span><p><b>Explore Health plan</b><small>Private plan. You may get help paying the premium.</small></p></div></div>'+
+ '<p class="fine">Estimates for adults, from Oregon Health Authority figures in effect through February 2027. Children and pregnant people qualify at higher incomes. Households of five or more: apply to find out. Only the application decides. According to the Oregon Health Authority, people of any immigration status may be eligible for OHP.</p>'+
+ card(K.ohp,{tag:"Apply any time"})+card(K.explore,{tag:"Deadline January 15"})+
+ '<article class="card"><h3>Other coverage to check</h3><p><b>A plan from your job.</b> If your employer offers insurance and you turned it down, ask HR when you can enroll. An affordable offer from a job can affect OHP Bridge and marketplace savings.</p><p><b>Medicare.</b> Age 65 or older, or on Social Security disability. Call SHIBA at 800-722-4134 for free help.</p><p><b>VA health care.</b> If you served in the military, call Clatsop County Veterans Services at 971-308-1045.</p></article>'+
+ '<div class="actions"><button class="btn ghost" data-act="go" data-v="s3">Back</button><button class="btn" data-act="go" data-v="plan">See my plan</button></div>';
+}
+
+function buildPlan(){
+ var adult=S.who==="adult",sud=!!S.concerns.sud,psy=!!S.concerns.psy;
+ var urgent=S.urgency!=="wait"||psy;
+ var cbh=adult?K.cbh:K.cbhKids,list=[];
+ var c=S.cov;
+ if(c==="ohp")list=[[cbh,"OHP covers care here at no cost to you."],[K.cmh,"A good choice if you already have a doctor at one of these clinics."],[K.coastal],[K.cco,"Call if you cannot get an appointment or want other options."]];
+ else if(c==="private")list=[[K.insurer,"Your plan decides which providers are covered, so start here to avoid a surprise bill."],[K.eap,"Often the fastest way to talk with a counselor at no cost."],[K.cmh],[cbh,null,"Ask whether they bill your plan."]];
+ else if(c==="medicare")list=[[K.cmh,"Primary care clinics are the quickest way into mental health care with Medicare."],[cbh,null,"Ask whether they bill your Medicare plan."],[K.coastal],[K.shiba]];
+ else if(c==="va")list=adult?[[K.va,"Your VA benefits cover mental health care here."],[K.cvso],[cbh,"A local option if you prefer care outside the VA.",null]]:[[K.tricare,"TRICARE decides which providers are covered for a child or teen."],[cbh],[K.cmh]];
+ else if(c==="none")list=[[cbh,"You can start here without insurance.","Ask about paying without insurance and whether a sliding fee applies."],[K.coastal,"Fees are based on your income."],[K.ohp,"Apply now so future visits are covered."],[K.eap]];
+ else list=[[cbh,"You can start here while you sort out coverage.","Ask the Engagement Specialist to help check your coverage."],[K.coastal,"Fees are based on your income if it turns out you are uninsured."],[K.ohp,"ONE Customer Service can tell you whether you already have active OHP."],[K.eap]];
+ if(!adult)list=list.filter(function(x){return x[0]!==K.eap;});
+ var first,why;
+ if(urgent){
+  first=adult?K.rac:K.cbhYouthUrgent;
+  why=psy?"These symptoms should be seen soon. This is the fastest in-person option in the county.":"You said you need help now. This is the fastest in-person option in the county.";
+  if(psy)why+=" If the person is 12 to 25, ask about EASA, the early psychosis program.";
+ }else{first=list[0][0];why=list[0][1];var fn=list[0][2];list=list.slice(1);if(fn)first=Object.assign({},first,{note:fn});}
+ if(sud&&adult)list.unshift([K.sud,"You asked for help with alcohol or drug use."]);
+ if(sud&&!adult)why=(why||"")+" Tell them alcohol or drug use is part of the concern.";
+ if(!adult)list.push([K.warm]);
+ return {first:first,why:why,rest:list,urgent:urgent};
+}
+function scriptText(){
+ var adult=S.who==="adult",ps=picked().filter(function(c){return c.p;}).slice(0,3).map(function(c){return c.p;});
+ var what=ps.length?(ps.length>1?ps.slice(0,-1).join(", ")+" and "+ps[ps.length-1]:ps[0]):"a hard time lately";
+ var cov={ohp:"I have the Oregon Health Plan.",private:"I have insurance through [plan name]. Are you in network?",medicare:"I have Medicare. Do you accept it?",va:adult?"I am a Veteran.":"We have TRICARE. Do you accept it?",none:"I do not have insurance right now. Do you have a sliding fee?",unsure:"I am not sure what coverage I have. Can you help me check?"}[S.cov];
+ return "Hi, my name is [your name]. I would like to set up a first appointment for mental health care"+(adult?"":" for my child")+". "+(adult?"I have":"They have")+" been dealing with "+what+". "+cov+" What is your soonest opening, and what should I bring?";
+}
+function vPlan(){
+ var p=buildPlan(),safety=S.concerns.safety||S.urgency==="now";
+ var u={now:"Right now",week:"This week",wait:"Can wait"}[S.urgency];
+ var h=progress(4)+'<div class="stack"><p class="eyebrow">Step 4 of 4 · Your plan</p><h2>Here is who to call</h2><div class="chips"><span class="chip">'+picked().length+(picked().length===1?" symptom":" symptoms")+'</span><span class="chip">'+u+'</span><span class="chip">'+(S.who==="adult"?"Adult":"Under 18")+'</span><span class="chip">'+COVLABEL[S.cov]+'</span></div><button class="link" data-act="go" data-v="s1">Change my answers</button></div>';
+ h+=guide(["Start with the first call. It is the best match for your answers.","Voicemail? Leave your name and number, then try the next option.","Not sure what to say? Use the script near the bottom."]);
+ if(safety)h+='<article class="card red"><h3>If you are not safe, do this first</h3><p>Call or text 988, or call the Clatsop County crisis line. Both answer 24 hours a day.</p><a class="call" href="tel:988"><span>'+I.phone+'Call or text</span><em>988</em></a><a class="call" href="tel:5033255724"><span>'+I.phone+'County crisis line</span><em>503-325-5724</em></a></article>';
+ h+=card(p.first,{first:1,tag:p.urgent?"Go here first":"Call first",why:p.why});
+ if(p.rest.length){h+='<p class="eyebrow">'+(p.urgent?"For ongoing care":"More options")+"</p>";
+  p.rest.forEach(function(r){h+=card(r[0],{why:r[1],note:r[2]});});}
+ if(S.cov==="unsure")h+='<article class="card"><h3>Three ways to find out what coverage you have</h3><ol class="check"><li>Look for an insurance card in your wallet or a letter from a health plan.</li><li>Ask HR whether you are enrolled in a plan through work.</li><li>Call ONE Customer Service at 800-699-9075 and ask whether you have active Oregon Health Plan coverage.</li></ol></article>';
+ h+='<div class="stack"><h3>What to say when you call</h3><p class="script" id="script">'+scriptText()+'</p><button class="btn ghost" data-act="copy" style="align-self:flex-start">Copy script</button></div>';
+ h+='<div class="stack"><h3>Have these ready</h3><ul class="check"><li>Your insurance card, if you have one</li><li>Days and times you can come in</li><li>A list of medicines you take</li><li>A short note on what has been hardest</li></ul></div>';
+ h+='<p class="fine">This guide shares information. It is not medical advice or a diagnosis, and it does not guarantee an appointment or coverage. Hours and phone numbers were checked on November 13, 2026. Confirm them when you call.</p>';
+ h+='<div class="actions"><button class="btn ghost" data-act="go" data-v="'+(S.cov==="none"?"s3b":"s3")+'">Back</button><button class="btn" data-act="restart">Start over</button></div>';
+ return h;
+}
+function vCrisis(){
+ var h='<div class="stack"><p class="eyebrow">Available 24 hours a day</p><h2>Get help right now</h2><p class="lede">You do not need insurance to call any of these numbers. 988 and the county crisis line are free.</p></div>';
+ if(S.crisisFrom)h+='<article class="card"><p>Your answer tells us safety comes first. Please reach out to one of these now. When you are ready, you can finish the guide to set up ongoing care.</p></article>';
+ h+=card(K.c988)+card(K.ccl)+card(K.c911)+card(K.er)+card(K.vcl);
+ h+=guide(["Stay with someone you trust, or ask them to come to you.","Move away from anything you could use to hurt yourself.","If you cannot call, text 988."]);
+ if(S.crisisFrom)h+='<div class="actions"><button class="btn" data-act="resume">I am safe for now. Continue the guide</button></div>';
+ return h;
+}
+function vDirectory(){
+ function grp(t,ks){return '<p class="eyebrow">'+t+"</p>"+ks.map(function(k){return card(K[k]);}).join("");}
+ return '<div class="stack"><h2>Directory</h2><p class="lede">Every number in this guide, in one place.</p></div>'+
+ grp("Crisis, 24 hours",["c988","ccl","c911","vcl","er"])+
+ grp("Mental health care",["cbh","rac","cbhKids","sud","cmh","coastal","va"])+
+ grp("Coverage and benefits",["ohp","cco","explore","shiba","cvso"])+
+ grp("Support",["eap","warm"])+
+ '<div class="stack"><h3>Where this information comes from</h3><ul class="src"><li>Clatsop Behavioral Healthcare, clatsopbh.org</li><li>Columbia Memorial Hospital, columbiamemorial.org/behavioral-health</li><li>Yakima Valley Farm Workers Clinic, Coastal Family Health Center brochure, 2026</li><li>U.S. Department of Veterans Affairs, Astoria VA Clinic page</li><li>Oregon Health Authority: Apply for OHP, OHP Bridge, and Explore Health launch notice of November 2, 2026</li><li>Columbia Pacific CCO, mental health resources page</li><li>Oregon SHIBA, shiba.oregon.gov</li><li>988 Suicide and Crisis Lifeline and Veterans Crisis Line</li><li>211info and City of Seaside community resources</li></ul><p class="fine">Checked on November 13, 2026. Clinics change hours and staff. Call to confirm. This guide is independent and is not run by any clinic, insurer, or government agency.</p></div>';
+}
+
+/* ---------- Render ---------- */
+function render(keep){
+ var v=S.tab==="crisis"?vCrisis():S.tab==="directory"?vDirectory():{home:vHome,s1:vS1,s2:vS2,s3:vS3,s3b:vS3b,plan:vPlan}[S.view]();
+ var y=main.scrollTop;
+ main.innerHTML=v;
+ main.scrollTop=keep?y:0;
+ var t=document.querySelectorAll(".tabs button");
+ for(var i=0;i<t.length;i++){if(t[i].getAttribute("data-v")===S.tab)t[i].setAttribute("aria-current","page");else t[i].removeAttribute("aria-current");}
+ if(!keep){try{main.focus({preventScroll:true});}catch(e){}}
+}
+function setTab(t,fromHash){
+ S.tab=t;
+ if(!fromHash){try{if(location.hash!=="#"+t)location.hash=t;}catch(e){}}
+ render();
+}
+function toCrisis(from){S.crisisFrom=from;S.shown=true;setTab("crisis");}
+
+document.addEventListener("click",function(e){
+ var el=e.target.closest("[data-act]");if(!el)return;
+ var a=el.getAttribute("data-act"),v=el.getAttribute("data-v");
+ if(a==="tab"){if(v!=="crisis")S.crisisFrom=S.tab==="crisis"?null:S.crisisFrom;setTab(v);}
+ else if(a==="home"){S.view="home";S.crisisFrom=null;setTab("guide");}
+ else if(a==="go"){S.view=v;render();}
+ else if(a==="concern"){S.concerns[v]=!S.concerns[v];render(true);}
+ else if(a==="urg"){S.urgency=v;render(true);}
+ else if(a==="who"){S.who=v;render(true);}
+ else if(a==="cov"){S.cov=v;render(true);}
+ else if(a==="hh"){S.hh=+v;render(true);}
+ else if(a==="next1"){if(S.concerns.safety&&!S.shown)toCrisis("s1");else{S.view="s2";render();}}
+ else if(a==="next2"){if(S.urgency==="now"&&!S.shown)toCrisis("s2");else{S.view="s3";render();}}
+ else if(a==="next3"){S.view=S.cov==="none"?"s3b":"plan";render();}
+ else if(a==="resume"){S.view=S.crisisFrom==="s1"?"s2":"s3";S.crisisFrom=null;setTab("guide");}
+ else if(a==="restart"){S.view="home";S.concerns={};S.urgency=S.who=S.cov=null;S.hh=1;S.crisisFrom=null;S.shown=false;render();}
+ else if(a==="copy"){
+  var txt=document.getElementById("script").textContent;
+  var done=function(ok){el.textContent=ok?"Copied":"Press and hold the text to copy";};
+  try{navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});}catch(err){done(false);}
+ }
+});
+function fromHash(){
+ var h=(location.hash||"").replace("#","");
+ if(h==="guide"||h==="directory"||h==="crisis"){if(h!==S.tab)setTab(h,true);}
+}
+window.addEventListener("hashchange",fromHash);
+var h0=(location.hash||"").replace("#","");
+if(h0==="directory"||h0==="crisis")S.tab=h0;
+render();
+})();
+</script>
+</body>
+</html>
