@@ -157,6 +157,19 @@ p{margin:0}
 .st.no{background:var(--crisis-soft);color:var(--crisis)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
+.tools{display:flex;gap:6px;align-items:center}
+.tool{display:inline-grid;place-items:center;min-width:40px;height:38px;padding:0 8px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;color:var(--ink)}
+.tool[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.top{flex-wrap:nowrap;padding:10px 12px}
+.tools{flex:none}
+@media (max-width:440px){.mark{display:none}.brand small{display:none}.tool{min-width:36px;padding:0 6px}.sos{padding:8px 10px}}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qbtn{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px;min-height:96px}
+.qbtn .qi{width:34px;height:34px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center}
+.qbtn b{font-weight:700;font-size:15px;line-height:1.25}
+.qbtn small{color:var(--muted);font-size:13px;line-height:1.3}
+.share{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.share p{font-size:14px}
 .tabs{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line)}
 .tabs button{background:none;border:0;padding:9px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 .tabs button[aria-current="page"]{color:var(--brand)}
@@ -171,7 +184,11 @@ p{margin:0}
       <span class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20c0-5 4-5 4-9a3 3 0 0 1 6 0c0 4 4 4 4 9"/><circle cx="12" cy="5" r="1.6"/></svg></span>
       <span><b>Clatsop Care Path</b><small>Mental health help</small></span>
     </button>
-    <button class="sos" data-act="tab" data-v="crisis"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9.5"/></svg>Crisis help</button>
+    <div class="tools">
+    <button class="tool" id="tsize" data-act="tsize" aria-label="Change text size">A<span style="font-size:.8em">A</span></button>
+    <button class="tool" id="speak" data-act="speak" aria-pressed="false" aria-label="Read this screen aloud"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a3.5 3.5 0 0 1 0 6"/><path d="M18.5 6.5a7 7 0 0 1 0 11"/></svg></button>
+    <button class="sos" data-act="tab" data-v="crisis"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9.5"/></svg>Crisis</button>
+    </div>
   </header>
   <main id="main" tabindex="-1"></main>
   <nav class="tabs" aria-label="Sections">
@@ -214,6 +231,20 @@ var K={
  shiba:{title:"Medicare help (SHIBA)",desc:"Free, unbiased counseling from the State of Oregon on what your Medicare plan covers.",ask:"Ask what your plan pays for outpatient mental health visits.",phones:[{l:"SHIBA",n:"800-722-4134"},{l:"Medicare",n:"800-633-4227"}]},
  ohp:{title:"Apply for the Oregon Health Plan",desc:"OHP is free coverage that includes mental health care. You can apply any time of year. One application covers OHP and OHP Bridge. A decision can take up to 45 days.",ask:"Online at ONE.Oregon.gov, by phone, or in person at the ODHS office in Astoria.",hours:"Phone: Monday to Friday, 7 am to 6 pm",places:["ODHS office: 422 Gateway Ave, Astoria"],phones:[{l:"ONE Customer Service",n:"800-699-9075"}],link:{t:"ONE.Oregon.gov",h:"https://one.oregon.gov"}},
  explore:{title:"Explore Health marketplace",desc:"Oregon's marketplace for private plans, with help paying premiums based on income. Open enrollment for 2027 runs through January 15, 2027. Enroll by December 31 for coverage that starts January 1.",ask:"Ask for a free local assister or agent to help you compare plans.",hours:"Monday to Friday 8 am to 5 pm, Saturday 8 am to 1 pm",phones:[{l:"Explore Health",n:"855-268-3767"}],link:{t:"ExploreHealthOR.gov",h:"https://explorehealthor.gov"}},
+ nwrides:{title:"NW Rides: free rides for OHP members",desc:"Free rides to medical, mental health, and dental visits covered by the Oregon Health Plan, for Columbia Pacific CCO members with no other way to get there. You can schedule up to 90 days ahead.",ask:"Have ready: your OHP member ID, the clinic name, address and phone, and the date and time of the visit.",hours:"Office: Monday to Friday, 8 am to 5 pm",phones:[{l:"NW Rides",n:"503-861-0657"},{l:"Toll-free",n:"888-793-0439"}]},
+ bus:{title:"The Bus: Dial-A-Ride and paratransit",desc:"Sunset Empire Transportation District runs door-to-door Dial-A-Ride in some areas by reservation, and ADA paratransit for people who cannot use the regular bus. Veterans and military members ride free with proof of service.",ask:"Ask a Transportation Specialist about Dial-A-Ride or paratransit. Paratransit needs an application.",phones:[{l:"The Bus",n:"503-861-7433"}],link:{t:"nwconnector.org",h:"https://nwconnector.org/setd/"}},
+ nwsds:{title:"NorthWest Senior and Disability Services",desc:"For people 60 and older and adults with disabilities. Help with Medicaid, SNAP, Medicare counseling (SHIBA), in-home care options, caregiver support, and Senior Peer Mentoring.",ask:"Ask for options counseling. Say what is getting harder at home.",hours:"Monday to Friday, 8 am to 5 pm",places:["2002 SE Chokeberry Ave, Warrenton"],phones:[{l:"Warrenton office",n:"503-861-4200"},{l:"Toll-free",n:"800-442-8614"}]},
+ adrc:{title:"Aging and Disability Resource Connection (ADRC)",desc:"Oregon's statewide line for older adults and people with disabilities. Apply for Medicaid long-term care and Medicare Savings Programs, which can help pay Medicare premiums.",phones:[{l:"ADRC",n:"855-673-2372"}]},
+ lonely:{title:"Senior Loneliness Line",desc:"Free, confidential calls for older adults in Oregon who feel lonely, isolated, anxious, or down. You can call more than once a day. English and Spanish speakers, interpreters for other languages.",hours:"Every day, 5:30 am to 11:30 pm",phones:[{l:"Toll-free",n:"800-282-7035"},{l:"Portland area",n:"503-200-1633"}]},
+ peer:{title:"David Romprey Oregon Warmline",desc:"Talk with a trained peer who has lived through mental health or addiction challenges. Not a crisis line. Free, confidential, English and Spanish.",hours:"24 hours, every day",phones:[{l:"Warmline",n:"800-698-2392"}]},
+ nami:{title:"NAMI Oregon Helpline",desc:"Information, family support groups, and free classes for people living with mental illness and the people who love them.",phones:[{l:"NAMI Oregon",n:"800-343-6264"},{l:"Portland area",n:"503-230-8009"}]},
+ rx:{title:"ArrayRx free prescription discount card",desc:"The State of Oregon's free discount card. Any Oregon resident can join, with no age or income limit. Use it at participating pharmacies, including for medicines your insurance does not cover.",phones:[{l:"Enroll by phone",n:"800-913-4146"}],link:{t:"Oregon Prescription Drug Program",h:"https://www.oregon.gov/oha/hpa/dsi-opdp/Pages/index.aspx"}},
+ caregiver:{title:"Family Caregiver Support Program",desc:"Free help for people caring for an older or disabled family member: respite care, counseling, support groups, and training. Run by NorthWest Senior and Disability Services.",phones:[{l:"Warrenton office",n:"503-861-4200"}]},
+ cca:{title:"Clatsop Community Action",desc:"Help with food, housing, and energy bills. Money stress is a common reason people struggle. Fixing the basics helps.",phones:[{l:"Main line",n:"503-325-1400"}]},
+ c211:{title:"211info",desc:"Free help finding local services of any kind: food, housing, utilities, child care, legal help, and more.",phones:[{l:"Call",n:"211"}],link:{t:"211info.org",h:"https://www.211info.org"}},
+ es988:{title:"988 en español",desc:"Línea de Prevención del Suicidio y Crisis. Gratis y confidencial, las 24 horas. Llame al 988 y oprima 2, o envíe un texto con la palabra AYUDA al 988.",phones:[{l:"Llamar y oprimir 2",n:"988"}],red:1},
+ esccl:{title:"Línea de crisis del condado de Clatsop",desc:"Las 24 horas, todos los días. Pida un intérprete si lo necesita.",phones:[{l:"Línea de crisis",n:"503-325-5724"}],red:1},
+ esmore:{title:"Más ayuda en español",desc:"El Oregon Warmline (800-698-2392) ofrece apoyo de compañeros en español. La Senior Loneliness Line (800-282-7035) tiene consejeros que hablan español. NW Rides tiene mensajes en español. El mercado de seguros tiene sitio en español: Espanol.ExploreHealthOR.gov.",ask:"En cualquier clínica, diga: \"Necesito un intérprete en español, por favor.\" Para clínicas que reciben fondos federales y para el Plan de Salud de Oregon, el intérprete es gratis.",phones:[{l:"Oregon Warmline",n:"800-698-2392"}]},
  warm:{title:"Reach Out Oregon Parent Warmline",desc:"A statewide support line for parents and caregivers.",phones:[{l:"Warmline",n:"833-732-2467"}]},
  c911:{title:"911",desc:"If you or someone else is in immediate danger.",phones:[{l:"Emergency",n:"911"}],red:1},
  c988:{title:"988 Suicide and Crisis Lifeline",desc:"Call or text 988 to reach a trained counselor. Free and confidential, 24 hours a day. Press 2 for Spanish.",phones:[{l:"Call or text",n:"988"}],link:{t:"Chat at 988lifeline.org/chat",h:"https://988lifeline.org/chat"},red:1},
@@ -240,7 +271,7 @@ var URG=[
  {id:"week",t:"Today or this week",s:"I am struggling to get through the day."},
  {id:"wait",t:"Soon, and I can wait for an appointment",s:"Things are hard but steady."}
 ];
-var WHO=[{id:"adult",t:"An adult, 18 or older"},{id:"minor",t:"A child or teen under 18"}];
+var WHO=[{id:"adult",t:"An adult, 18 to 64"},{id:"senior",t:"An older adult, 65 or older"},{id:"minor",t:"A child or teen under 18"}];
 var COV=[
  {id:"private",t:"Insurance through a job or a private plan",s:"Such as Regence, Providence, Moda, PacificSource, Kaiser, Aetna, or Cigna."},
  {id:"ohp",t:"Oregon Health Plan (OHP)",s:"Oregon's Medicaid. In Clatsop County the plan is usually Columbia Pacific CCO."},
@@ -254,7 +285,7 @@ var COVLABEL={private:"Private insurance",ohp:"Oregon Health Plan",medicare:"Med
 var BANDS={1:[21228,31920],2:[28788,43280],3:[36336,54640],4:[43896,66000]};
 
 /* ---------- State (kept in memory only; nothing is stored or sent) ---------- */
-var S={ins:null,tab:"guide",view:"home",concerns:{},urgency:null,who:null,cov:null,hh:1,crisisFrom:null,shown:false};
+var S={topic:null,ins:null,tab:"guide",view:"home",concerns:{},urgency:null,who:null,cov:null,hh:1,crisisFrom:null,shown:false};
 var main=document.getElementById("main");
 
 function money(n){return "$"+n.toLocaleString("en-US");}
@@ -290,6 +321,9 @@ function vHome(){
  guide(["Takes about two minutes.","Private. Your answers stay on this screen. Nothing is saved or sent.","This is not a diagnosis. It points you to people who can help."])+
  '<button class="btn" data-act="go" data-v="s1">Start</button>'+
  '<article class="card red"><h3>Not safe right now?</h3><p>Call or text 988, or call the Clatsop County crisis line at 503-325-5724. Both answer 24 hours a day.</p><button class="btn red" data-act="tab" data-v="crisis">See crisis help</button></article>'+
+ '<div class="stack"><p class="eyebrow">Quick help</p><div class="qgrid">'+["seniors","rides","rx","talk","caregiver","basics","es"].map(qbtn).join("")+'</div></div>'+
+ '<div class="share"><p>Know someone who needs this? Share the link.</p><button class="btn ghost" data-act="share" style="flex:none">Copy link</button></div>'+
+ guide(["Tap <b>AA</b> at the top to make text bigger.","Tap the speaker to hear this screen read aloud."])+
  '<p class="fine">Independent community guide. Not run by any clinic, insurer, or government agency.</p>';
 }
 function vS1(){
@@ -327,7 +361,7 @@ function vS3b(){
 }
 
 function buildPlan(){
- var adult=S.who==="adult",sud=!!S.concerns.sud,psy=!!S.concerns.psy;
+ var adult=S.who!=="minor",senior=S.who==="senior",sud=!!S.concerns.sud,psy=!!S.concerns.psy;
  var urgent=S.urgency!=="wait"||psy;
  var cbh=adult?K.cbh:K.cbhKids,list=[];
  var c=S.cov;
@@ -347,10 +381,13 @@ function buildPlan(){
  if(sud&&adult)list.unshift([K.sud,"You asked for help with alcohol or drug use."]);
  if(sud&&!adult)why=(why||"")+" Tell them alcohol or drug use is part of the concern.";
  if(!adult)list.push([K.warm]);
+ if(senior){list.push([K.nwsds,"Local help for people 60 and older, including Medicare counseling."]);list.push([K.lonely]);}
+ if(senior&&c!=="medicare")list.push([K.shiba,"Most people 65 and older qualify for Medicare. Free help to sign up."]);
+ list.push(c==="ohp"?[K.nwrides,"Need a ride? It is free with your OHP."]:[K.bus,"Need a ride to your appointment?"]);
  return {first:first,why:why,rest:list,urgent:urgent};
 }
 function scriptText(){
- var adult=S.who==="adult",ps=picked().filter(function(c){return c.p;}).slice(0,3).map(function(c){return c.p;});
+ var adult=S.who!=="minor",ps=picked().filter(function(c){return c.p;}).slice(0,3).map(function(c){return c.p;});
  var what=ps.length?(ps.length>1?ps.slice(0,-1).join(", ")+" and "+ps[ps.length-1]:ps[0]):"a hard time lately";
  var cov={ohp:"I have the Oregon Health Plan.",private:"I have insurance through [plan name]. Are you in network?",medicare:"I have Medicare. Do you accept it?",va:adult?"I am a Veteran.":"We have TRICARE. Do you accept it?",none:"I do not have insurance right now. Do you have a sliding fee?",unsure:"I am not sure what coverage I have. Can you help me check?"}[S.cov];
  return "Hi, my name is [your name]. I would like to set up a first appointment for mental health care"+(adult?"":" for my child")+". "+(adult?"I have":"They have")+" been dealing with "+what+". "+cov+" What is your soonest opening, and what should I bring?";
@@ -358,7 +395,7 @@ function scriptText(){
 function vPlan(){
  var p=buildPlan(),safety=S.concerns.safety||S.urgency==="now";
  var u={now:"Right now",week:"This week",wait:"Can wait"}[S.urgency];
- var h=progress(4)+'<div class="stack"><p class="eyebrow">Step 4 of 4 · Your plan</p><h2>Here is who to call</h2><div class="chips"><span class="chip">'+picked().length+(picked().length===1?" symptom":" symptoms")+'</span><span class="chip">'+u+'</span><span class="chip">'+(S.who==="adult"?"Adult":"Under 18")+'</span><span class="chip">'+COVLABEL[S.cov]+'</span></div><button class="link" data-act="go" data-v="s1">Change my answers</button></div>';
+ var h=progress(4)+'<div class="stack"><p class="eyebrow">Step 4 of 4 · Your plan</p><h2>Here is who to call</h2><div class="chips"><span class="chip">'+picked().length+(picked().length===1?" symptom":" symptoms")+'</span><span class="chip">'+u+'</span><span class="chip">'+({adult:"Adult",senior:"65 or older",minor:"Under 18"}[S.who])+'</span><span class="chip">'+COVLABEL[S.cov]+'</span></div><button class="link" data-act="go" data-v="s1">Change my answers</button></div>';
  h+=guide(["Start with the first call. It is the best match for your answers.","Voicemail? Leave your name and number, then try the next option.","Not sure what to say? Use the script near the bottom."]);
  if(safety)h+='<article class="card red"><h3>If you are not safe, do this first</h3><p>Call or text 988, or call the Clatsop County crisis line. Both answer 24 hours a day.</p><a class="call" href="tel:988"><span>'+I.phone+'Call or text</span><em>988</em></a><a class="call" href="tel:5033255724"><span>'+I.phone+'County crisis line</span><em>503-325-5724</em></a></article>';
  h+=card(p.first,{first:1,tag:p.urgent?"Go here first":"Call first",why:p.why});
@@ -386,8 +423,41 @@ function vDirectory(){
  grp("Crisis, 24 hours",["c988","ccl","c911","vcl","er"])+
  grp("Mental health care",["cbh","rac","cbhKids","sud","cmh","coastal","va"])+
  grp("Coverage and benefits",["ohp","cco","explore","shiba","cvso"])+
- grp("Support",["eap","warm"])+
+ grp("Older adults",["nwsds","adrc","lonely","shiba"])+
+ grp("Rides and medicine",["nwrides","bus","rx"])+
+ grp("Support",["peer","nami","eap","warm","caregiver","cca","c211"])+
+ grp("En español",["es988","esmore"])+
  '<div class="stack"><h3>Where this information comes from</h3><ul class="src"><li>Clatsop Behavioral Healthcare, clatsopbh.org</li><li>Columbia Memorial Hospital, columbiamemorial.org/behavioral-health</li><li>Yakima Valley Farm Workers Clinic, Coastal Family Health Center brochure, 2026</li><li>U.S. Department of Veterans Affairs, Astoria VA Clinic page</li><li>Oregon Health Authority: Apply for OHP, OHP Bridge, and Explore Health launch notice of November 2, 2026</li><li>Columbia Pacific CCO, mental health resources page</li><li>Oregon SHIBA, shiba.oregon.gov</li><li>988 Suicide and Crisis Lifeline and Veterans Crisis Line</li><li>211info and City of Seaside community resources</li></ul><p class="fine">Checked on November 13, 2026. Clinics change hours and staff. Call to confirm. This guide is independent and is not run by any clinic, insurer, or government agency.</p></div>';
+}
+
+/* ---------- Quick help topics ---------- */
+var QI={
+ seniors:'<path d="M12 4a3 3 0 1 0 0 .01"/><path d="M8 21v-6l-2-4 6-2 6 2-2 4v6"/>',
+ rides:'<rect x="4" y="4" width="16" height="13" rx="3"/><path d="M4 11h16"/><circle cx="8" cy="20" r="1.5"/><circle cx="16" cy="20" r="1.5"/>',
+ rx:'<rect x="3" y="9" width="18" height="7" rx="3.5"/><path d="M12 9v7"/>',
+ talk:'<path d="M4 5h16v10H9l-5 4z"/>',
+ caregiver:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+ basics:'<path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-5h4v5"/>',
+ es:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
+};
+var TOPICS={
+ seniors:{t:"Older adults (60+)",s:"Medicare, in-home help, someone to talk to",lede:"Help for older adults and the people who care for them.",g:["Mental health care is covered by Medicare and the Oregon Health Plan.","Feeling low is not a normal part of aging. It can be treated.","Hearing or vision problems? Ask the clinic for a video visit with captions, or bring someone you trust."],k:["nwsds","shiba","lonely","adrc","bus","rx"]},
+ rides:{t:"Rides to appointments",s:"Free rides with OHP, Dial-A-Ride",lede:"No car? These services can get you to your visit.",g:["On the Oregon Health Plan? Rides to covered visits are free. Call at least two days ahead when you can.","No OHP? The Bus can help with Dial-A-Ride or paratransit.","Ask any clinic about video visits. Then you do not need a ride."],k:["nwrides","bus"]},
+ rx:{t:"Medicine costs",s:"Free state discount card",lede:"Ways to pay less for prescriptions.",g:["Ask the pharmacist: Is there a cheaper generic?","With Medicare, ask SHIBA about Extra Help with drug costs.","Coastal Family Health Center has its own pharmacy and sliding fees."],k:["rx","shiba","coastal"]},
+ talk:{t:"Someone to talk to",s:"Peer support lines, no crisis needed",lede:"You do not need to be in crisis to call. These lines are for a hard day.",g:["A warmline is a person who listens. It is not an emergency line.","If you feel unsafe, use 988 instead."],k:["peer","lonely","nami","warm"]},
+ caregiver:{t:"Helping someone else",s:"For family, friends, and caregivers",lede:"Worried about someone? Support for you and for them.",g:["Use the guide and answer for the person you are worried about.","You can call the county crisis line about someone else. You do not need their permission.","Caring for someone is hard. Your own health counts too."],k:["ccl","caregiver","nami","warm","nwsds"]},
+ basics:{t:"Food, housing, and bills",s:"Stress about money is real",lede:"When basic needs are covered, everything else gets easier.",g:["Call 211 if you are not sure where to start.","Many people qualify for SNAP food benefits and do not know it. Apply with the same ONE application as OHP."],k:["cca","c211","ohp"]},
+ es:{t:"En español",s:"Ayuda en español",lede:"Ayuda gratis en español. Puede pedir un intérprete en cualquier lugar.",g:["Llame al 988 y oprima 2 para hablar con alguien en español.","Usted tiene derecho a un intérprete gratis en el Plan de Salud de Oregon."],k:["es988","esccl","esmore"],lang:"es"}
+};
+function qbtn(id){var t=TOPICS[id];return '<button class="qbtn" data-act="topic" data-v="'+id+'"><span class="qi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+QI[id]+'</svg></span><b>'+t.t+'</b><small>'+t.s+'</small></button>';}
+function vTopic(){
+ var t=TOPICS[S.topic];
+ var h='<div class="stack"'+(t.lang?' lang="'+t.lang+'"':'')+'><button class="link" data-act="go" data-v="home" style="align-self:flex-start">'+(t.lang?"Volver":"Back")+'</button><p class="eyebrow">'+(t.lang?"Ayuda rápida":"Quick help")+'</p><h2>'+t.t+'</h2><p class="lede">'+t.lede+'</p></div>';
+ h+=guide(t.g);
+ h+=t.k.map(function(k){return card(K[k]);}).join("");
+ if(!t.lang)h+='<button class="btn ghost" data-act="go" data-v="s1">Start the full guide</button>';
+ h+='<p class="fine">'+(t.lang?"Verificado el 13 de noviembre de 2026. Confirme horarios al llamar.":"Checked November 13, 2026. Confirm hours when you call.")+'</p>';
+ return h;
 }
 
 /* ---------- Insurance check: where each plan is accepted (checked November 13, 2026) ---------- */
@@ -428,9 +498,23 @@ function vInsurance(){
  return h;
 }
 
+/* ---------- Accessibility: text size and read aloud ---------- */
+var Z=1;
+function stopSpeak(){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}var b=document.getElementById("speak");if(b)b.setAttribute("aria-pressed","false");}
+function speak(btn){
+ try{
+  var ss=window.speechSynthesis;if(!ss){btn.setAttribute("aria-label","Read aloud is not available on this device");return;}
+  if(ss.speaking){stopSpeak();return;}
+  var txt=main.innerText.replace(/\s+/g," ").slice(0,4000);
+  var u=new SpeechSynthesisUtterance(txt);u.rate=0.95;u.lang=S.view==="topic"&&S.topic==="es"&&S.tab==="guide"?"es-US":"en-US";
+  u.onend=stopSpeak;btn.setAttribute("aria-pressed","true");ss.speak(u);
+ }catch(e){stopSpeak();}
+}
+
 /* ---------- Render ---------- */
 function render(keep){
- var v=S.tab==="crisis"?vCrisis():S.tab==="directory"?vDirectory():S.tab==="insurance"?vInsurance():{home:vHome,s1:vS1,s2:vS2,s3:vS3,s3b:vS3b,plan:vPlan}[S.view]();
+ if(!keep)stopSpeak();
+ var v=S.tab==="crisis"?vCrisis():S.tab==="directory"?vDirectory():S.tab==="insurance"?vInsurance():{topic:vTopic,home:vHome,s1:vS1,s2:vS2,s3:vS3,s3b:vS3b,plan:vPlan}[S.view]();
  var y=main.scrollTop;
  main.innerHTML=v;
  main.scrollTop=keep?y:0;
@@ -457,6 +541,10 @@ document.addEventListener("click",function(e){
  else if(a==="cov"){S.cov=v;render(true);}
  else if(a==="hh"){S.hh=+v;render(true);}
  else if(a==="ins"){S.ins=v;render(true);}
+ else if(a==="topic"){S.topic=v;S.view="topic";setTab("guide");}
+ else if(a==="tsize"){Z=Z>=1.3?1:Math.round((Z+0.15)*100)/100;main.style.zoom=Z;el.setAttribute("aria-pressed",Z>1?"true":"false");}
+ else if(a==="speak"){speak(el);}
+ else if(a==="share"){var u=location.href.split("#")[0];try{navigator.clipboard.writeText(u).then(function(){el.textContent="Copied";},function(){el.textContent=u;});}catch(err){el.textContent=u;}}
  else if(a==="tab2"){S.view=v;setTab("guide");}
  else if(a==="next1"){if(S.concerns.safety&&!S.shown)toCrisis("s1");else{S.view="s2";render();}}
  else if(a==="next2"){if(S.urgency==="now"&&!S.shown)toCrisis("s2");else{S.view="s3";render();}}
