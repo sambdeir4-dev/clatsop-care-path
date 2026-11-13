@@ -139,7 +139,25 @@ p{margin:0}
 .fine{font-size:13px;color:var(--muted)}
 .src{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
 
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border-top:1px solid var(--line)}
+.plans{display:flex;flex-wrap:wrap;gap:8px}
+.plans button{background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:600;font-size:14.5px}
+.plans button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.acc{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.acc>div{display:flex;flex-direction:column;gap:6px;padding:13px 14px;border-top:1px solid var(--line)}
+.acc>div:first-child{border-top:0}
+.acc .row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.acc b{font-weight:600}
+.acc p{font-size:14px;color:var(--muted)}
+.acc a.tel{font-weight:700;font-variant-numeric:tabular-nums;text-decoration:none}
+.st{font-style:normal;flex:none;font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.st.yes{background:var(--brand);color:var(--brand-ink)}
+.st.most{background:var(--brand-soft);color:var(--brand)}
+.st.slide{background:var(--guide);color:var(--guide-ink);border:1px solid var(--guide-line)}
+.st.ask{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.st.no{background:var(--crisis-soft);color:var(--crisis)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line)}
 .tabs button{background:none;border:0;padding:9px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 .tabs button[aria-current="page"]{color:var(--brand)}
 .tabs button.t-crisis[aria-current="page"]{color:var(--crisis)}
@@ -159,6 +177,7 @@ p{margin:0}
   <nav class="tabs" aria-label="Sections">
     <button data-act="tab" data-v="guide"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Guide</button>
     <button data-act="tab" data-v="directory"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>Directory</button>
+    <button data-act="tab" data-v="insurance"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4"/></svg>Insurance</button>
     <button class="t-crisis" data-act="tab" data-v="crisis"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Crisis</button>
   </nav>
 </div>
@@ -235,7 +254,7 @@ var COVLABEL={private:"Private insurance",ohp:"Oregon Health Plan",medicare:"Med
 var BANDS={1:[21228,31920],2:[28788,43280],3:[36336,54640],4:[43896,66000]};
 
 /* ---------- State (kept in memory only; nothing is stored or sent) ---------- */
-var S={tab:"guide",view:"home",concerns:{},urgency:null,who:null,cov:null,hh:1,crisisFrom:null,shown:false};
+var S={ins:null,tab:"guide",view:"home",concerns:{},urgency:null,who:null,cov:null,hh:1,crisisFrom:null,shown:false};
 var main=document.getElementById("main");
 
 function money(n){return "$"+n.toLocaleString("en-US");}
@@ -289,7 +308,7 @@ function vS2(){
 }
 function vS3(){
  return head(3,"Insurance","What health coverage do you have?","This decides which clinics cost you the least.")+
- guide(["Check your wallet for a card. The plan name is on the front.","Have more than one? Pick the card you use most.","No card and no idea? Choose <b>I'm not sure</b>."])+
+ guide(["Check your wallet for a card. The plan name is on the front.","Have more than one? Pick the card you use most.","No card and no idea? Choose <b>I'm not sure</b>.","Want to see every clinic that takes your plan? Open the <b>Insurance</b> tab."])+
  '<div class="stack" role="radiogroup" aria-label="Health coverage">'+COV.map(function(c){return opt(c,S.cov===c.id,"radio","cov");}).join("")+"</div>"+
  '<div class="actions"><button class="btn ghost" data-act="go" data-v="s2">Back</button><button class="btn" data-act="next3"'+(S.cov?"":" disabled")+">"+(S.cov==="none"?"See coverage options":"See my plan")+"</button></div>";
 }
@@ -347,6 +366,7 @@ function vPlan(){
   p.rest.forEach(function(r){h+=card(r[0],{why:r[1],note:r[2]});});}
  if(S.cov==="unsure")h+='<article class="card"><h3>Three ways to find out what coverage you have</h3><ol class="check"><li>Look for an insurance card in your wallet or a letter from a health plan.</li><li>Ask HR whether you are enrolled in a plan through work.</li><li>Call ONE Customer Service at 800-699-9075 and ask whether you have active Oregon Health Plan coverage.</li></ol></article>';
  h+='<div class="stack"><h3>What to say when you call</h3><p class="script" id="script">'+scriptText()+'</p><button class="btn ghost" data-act="copy" style="align-self:flex-start">Copy script</button></div>';
+ h+='<button class="btn ghost" data-act="tab" data-v="insurance">Check where my insurance is accepted</button>';
  h+='<div class="stack"><h3>Have these ready</h3><ul class="check"><li>Your insurance card, if you have one</li><li>Days and times you can come in</li><li>A list of medicines you take</li><li>A short note on what has been hardest</li></ul></div>';
  h+='<p class="fine">This guide shares information. It is not medical advice or a diagnosis, and it does not guarantee an appointment or coverage. Hours and phone numbers were checked on November 13, 2026. Confirm them when you call.</p>';
  h+='<div class="actions"><button class="btn ghost" data-act="go" data-v="'+(S.cov==="none"?"s3b":"s3")+'">Back</button><button class="btn" data-act="restart">Start over</button></div>';
@@ -370,9 +390,47 @@ function vDirectory(){
  '<div class="stack"><h3>Where this information comes from</h3><ul class="src"><li>Clatsop Behavioral Healthcare, clatsopbh.org</li><li>Columbia Memorial Hospital, columbiamemorial.org/behavioral-health</li><li>Yakima Valley Farm Workers Clinic, Coastal Family Health Center brochure, 2026</li><li>U.S. Department of Veterans Affairs, Astoria VA Clinic page</li><li>Oregon Health Authority: Apply for OHP, OHP Bridge, and Explore Health launch notice of November 2, 2026</li><li>Columbia Pacific CCO, mental health resources page</li><li>Oregon SHIBA, shiba.oregon.gov</li><li>988 Suicide and Crisis Lifeline and Veterans Crisis Line</li><li>211info and City of Seaside community resources</li></ul><p class="fine">Checked on November 13, 2026. Clinics change hours and staff. Call to confirm. This guide is independent and is not run by any clinic, insurer, or government agency.</p></div>';
 }
 
+/* ---------- Insurance check: where each plan is accepted (checked November 13, 2026) ---------- */
+var STL={yes:"Accepted",most:"Most plans",slide:"Sliding fee",ask:"Call to ask",no:"Not accepted",free:"Free"};
+var PLANS=[
+ {id:"ohp",t:"Oregon Health Plan",find:"Columbia Pacific CCO helps members find a covered provider.",ph:{l:"Columbia Pacific behavioral health help",n:"503-488-2822"},site:"colpachealth.org"},
+ {id:"private",t:"Job or private plan",find:"Only your plan can confirm a provider is in network. Use the member number on the back of your card, or the plan's online provider search.",sites:"Regence: regence.com · Providence Health Plan: healthplans.providence.org · Moda: modahealth.com · PacificSource: pacificsource.com · Kaiser: kp.org · Aetna: aetna.com · Cigna: cigna.com"},
+ {id:"medicare",t:"Medicare",find:"Free, unbiased help from the State of Oregon on what your Medicare plan covers.",ph:{l:"SHIBA",n:"800-722-4134"},site:"medicare.gov"},
+ {id:"va",t:"VA health care",find:"Veterans enrolled in VA care can use the Astoria VA Clinic. Ask the VA about Community Care if you need a provider outside the VA.",ph:{l:"Astoria VA appointments, option 3",n:"503-721-1498"},site:"va.gov"},
+ {id:"tricare",t:"TRICARE",find:"TRICARE keeps its own list of covered providers. Call the number on your card.",site:"tricare.mil"},
+ {id:"none",t:"No insurance",find:"You can still get care. Apply for the Oregon Health Plan any time of year.",ph:{l:"ONE Customer Service",n:"800-699-9075"},site:"ONE.Oregon.gov"}
+];
+var PLACES=[
+ {t:"Crisis lines: 988 and the county crisis line (503-325-5724)",d:"Free for everyone, 24 hours.",s:{ohp:"free",private:"free",medicare:"free",va:"free",tricare:"free",none:"free"}},
+ {t:"CBH Rapid Access Clinic",d:"Same-day walk-in for adults. No insurance required.",n:"503-325-5722",s:{ohp:"free",private:"free",medicare:"free",va:"free",tricare:"free",none:"free"}},
+ {t:"Clatsop Behavioral Healthcare (CBH)",d:"Bills most commercial plans, Medicare and Medicaid. Sliding fee based on income.",n:"503-325-5722",s:{ohp:"yes",private:"most",medicare:"yes",va:"ask",tricare:"ask",none:"slide"}},
+ {t:"CMH-OHSU Health Primary Care",d:"Accepts OHP, Medicare and private insurance. Discounts and payment plans may be available.",n:"503-338-4675",s:{ohp:"yes",private:"most",medicare:"yes",va:"ask",tricare:"ask",none:"ask"}},
+ {t:"Coastal Family Health Center",d:"Community health center. Accepts OHP, Medicare and commercial insurance. Sliding fee for people without insurance.",n:"503-325-8315",s:{ohp:"yes",private:"most",medicare:"yes",va:"ask",tricare:"ask",none:"slide"}},
+ {t:"Astoria VA Clinic",d:"For Veterans enrolled in VA health care.",n:"503-721-1498",s:{ohp:"no",private:"no",medicare:"no",va:"yes",tricare:"ask",none:"no"}}
+];
+function telHref(n){return "tel:"+n.replace(/\D/g,"");}
+function vInsurance(){
+ var p=PLANS.filter(function(x){return x.id===S.ins;})[0];
+ var h='<div class="stack"><p class="eyebrow">Insurance check</p><h2>Where is my insurance accepted?</h2><p class="lede">Pick your coverage to see which local clinics take it and how to confirm.</p></div>';
+ h+=guide(["Look at the front of your insurance card for the plan name.","Nothing you pick here is saved or sent. Your employer does not see it.","Accepted does not always mean in network for your exact plan. Always confirm before your first visit."]);
+ h+='<div class="plans" role="group" aria-label="Your coverage">'+PLANS.map(function(x){return '<button data-act="ins" data-v="'+x.id+'" aria-pressed="'+(S.ins===x.id)+'">'+x.t+"</button>";}).join("")+"</div>";
+ if(!p){h+='<p class="fine">Choose a plan above to see results.</p>';return h;}
+ h+='<div class="legend"><span><i class="st yes">Accepted</i></span><span><i class="st most">Most plans</i>confirm yours</span><span><i class="st slide">Sliding fee</i>cost based on income</span><span><i class="st ask">Call to ask</i></span></div>';
+ h+='<div class="acc">'+PLACES.map(function(c){var st=c.s[p.id];
+  return '<div><div class="row"><b>'+c.t+'</b><i class="st '+(st==="free"?"yes":st)+'">'+STL[st]+"</i></div><p>"+c.d+"</p>"+(c.n&&st!=="no"?'<a class="tel" href="'+telHref(c.n)+'">'+c.n+"</a>":"")+"</div>";}).join("")+"</div>";
+ h+='<article class="card first"><span class="tag">How to confirm</span><h3>'+p.t+"</h3><p>"+p.find+"</p>"+
+  (p.ph?'<a class="call" href="'+telHref(p.ph.n)+'"><span>'+I.phone+p.ph.l+"</span><em>"+p.ph.n+"</em></a>":"")+
+  (p.site?'<p class="note">Online: '+p.site+"</p>":"")+(p.sites?'<p class="note">'+p.sites+"</p>":"")+"</article>";
+ h+='<div class="stack"><h3>Questions to ask when you call</h3><ul class="check"><li>Are you in network for my plan? Give the plan name and member ID.</li><li>What will a first visit cost me?</li><li>Do I need a referral or prior approval?</li><li>Do you offer video visits?</li></ul></div>';
+ if(p.id==="none")h+='<button class="btn" data-act="tab2" data-v="s3b">See coverage I can apply for</button>';
+ h+='<button class="btn ghost" data-act="tab2" data-v="s1">Start the full guide</button>';
+ h+='<p class="fine">Sources: Clatsop Behavioral Healthcare; Columbia Memorial Hospital via 211info and Washington Community Connect; Coastal Family Health Center via 211info and HRSA listing; U.S. Department of Veterans Affairs. Checked November 13, 2026. Plans and networks change. Confirm with the clinic and your plan.</p>';
+ return h;
+}
+
 /* ---------- Render ---------- */
 function render(keep){
- var v=S.tab==="crisis"?vCrisis():S.tab==="directory"?vDirectory():{home:vHome,s1:vS1,s2:vS2,s3:vS3,s3b:vS3b,plan:vPlan}[S.view]();
+ var v=S.tab==="crisis"?vCrisis():S.tab==="directory"?vDirectory():S.tab==="insurance"?vInsurance():{home:vHome,s1:vS1,s2:vS2,s3:vS3,s3b:vS3b,plan:vPlan}[S.view]();
  var y=main.scrollTop;
  main.innerHTML=v;
  main.scrollTop=keep?y:0;
@@ -398,6 +456,8 @@ document.addEventListener("click",function(e){
  else if(a==="who"){S.who=v;render(true);}
  else if(a==="cov"){S.cov=v;render(true);}
  else if(a==="hh"){S.hh=+v;render(true);}
+ else if(a==="ins"){S.ins=v;render(true);}
+ else if(a==="tab2"){S.view=v;setTab("guide");}
  else if(a==="next1"){if(S.concerns.safety&&!S.shown)toCrisis("s1");else{S.view="s2";render();}}
  else if(a==="next2"){if(S.urgency==="now"&&!S.shown)toCrisis("s2");else{S.view="s3";render();}}
  else if(a==="next3"){S.view=S.cov==="none"?"s3b":"plan";render();}
@@ -411,11 +471,11 @@ document.addEventListener("click",function(e){
 });
 function fromHash(){
  var h=(location.hash||"").replace("#","");
- if(h==="guide"||h==="directory"||h==="crisis"){if(h!==S.tab)setTab(h,true);}
+ if(h==="guide"||h==="directory"||h==="crisis"||h==="insurance"){if(h!==S.tab)setTab(h,true);}
 }
 window.addEventListener("hashchange",fromHash);
 var h0=(location.hash||"").replace("#","");
-if(h0==="directory"||h0==="crisis")S.tab=h0;
+if(h0==="directory"||h0==="crisis"||h0==="insurance")S.tab=h0;
 render();
 })();
 </script>
